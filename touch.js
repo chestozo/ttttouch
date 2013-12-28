@@ -86,9 +86,8 @@ var swipe = function(dir) {
                 var stopPoint = extractPoint(evt);
                 var info = getInfo(startPoint, stopPoint);
                 if (info.dir === dir && info.dist >= options.min) {
-                    callback(info);
+                    callback(evt, info);
                     $node.off(touchMoveEventName);
-                    evt.preventDefault();
                 }
             });
 
