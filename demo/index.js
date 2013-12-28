@@ -5,10 +5,25 @@ var init = function() {
     var left;
     var defaultLeft = parseInt($node.css('margin-left'), 10);
 
+    // ttttouch.on(node, 'singleTap', function() {
+    //     $node.css('background-color', '#EEE');
+    // });
+
     ttttouch.on(node, 'swipeLeft', function() {
-        console.log('swiped left');
+        $node.css('background-color', 'red');
     });
 
+    ttttouch.on(node, 'swipeRight', function() {
+        $node.css('background-color', 'green');
+    });
+
+    ttttouch.on(node, 'swipeTop', function() {
+        $node.css('background-color', 'white');
+    });
+
+    ttttouch.on(node, 'swipeBottom', function() {
+        $node.css('background-color', 'yellow');
+    });
 
 
 
