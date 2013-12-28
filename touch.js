@@ -54,6 +54,7 @@ var eventTypes = {
             return 0;
         }
 
+        // 0 .. 359
         function a(dx, dy) {
             if (dx === 0) {
                 return dy > 0 ? 90 : 270;
@@ -61,7 +62,12 @@ var eventTypes = {
             if (dy === 0) {
                 return dx > 0 ? 0 : 180;
             }
-            return Math.round((Math.acos(dx) * 180 / Math.PI) + (dy < 0 ? 180 : 0));
+            var a = Math.round(Math.acos(dx) * 180 / Math.PI);
+
+            if (dy < 0) {
+                a = 360 - a;
+            }
+            return a;
         }
 
         function dir(a) {
