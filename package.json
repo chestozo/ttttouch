@@ -1,0 +1,13 @@
+{
+    "version": "0.0.1",
+    "name": "ttttouch",
+    "description": "Touch gestures lib for my little projects",
+
+    "devDependencies": {
+        "expect.js": "*",
+        "grunt": "*",
+        "grunt-cli": "*",
+        "grunt-mocha": "*",
+        "sinon": "*"
+    }
+}
