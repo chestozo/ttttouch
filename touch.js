@@ -15,7 +15,11 @@ var evtType = function(type) {
 
 var extractPoint = function(evt) {
     var origEvent = evt.originalEvent;
-    return origEvent.touches ? [ origEvent.touches[0].pageX, origEvent.touches[0].pageY ] : [ origEvent.pageX, origEvent.pageY ];
+    if (is_touch) {
+        return origEvent.touches.length ? [ origEvent.touches[0].screenX, origEvent.touches[0].screenY ] : null;
+    } else {
+        return [ origEvent.screenX, origEvent.screenY ];
+    }
 };
 
 var getInfo = function(p1, p2) {
@@ -103,7 +107,7 @@ $(document)
             return;
         }
 
-        var gesture = getGesture(touchStartPoint, extractPoint(evt));
+        var gesture = getGesture(touchStartPoint, extractPoint(evt) || touchStartPoint);
         if (gesture) {
             $(touchStartNode).trigger(gesture.type, [ evt, gesture.info ]);
 
