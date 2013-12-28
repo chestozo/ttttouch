@@ -68,9 +68,17 @@ var getInfo = function(p1, p2) {
 
 var swipe = function(dir) {
     return function(node, callback, options) {
-        var $node = $(node);
         var startPoint;
+        var selector = undefined;
+
         options = $.extend({ min: 3 }, options);
+
+        if (typeof node === 'string') {
+            selector = node;
+            node = document;
+        }
+
+        var $node = $(node);
 
         $node.on(evtType('touchstart'), function(evt) {
             startPoint = extractPoint(evt);
@@ -82,18 +90,18 @@ var swipe = function(dir) {
                 return;
             }
 
-            $node.on(touchMoveEventName, function(evt) {
+            $node.on(touchMoveEventName, selector, function(evt) {
                 var stopPoint = extractPoint(evt);
                 var info = getInfo(startPoint, stopPoint);
                 if (info.dir === dir && info.dist >= options.min) {
                     callback(evt, info);
-                    $node.off(touchMoveEventName);
+                    $node.off(touchMoveEventName, selector);
                 }
             });
 
-            $node.on(touchEndEventName, function(evt) {
-                $node.off(touchMoveEventName);
-                $node.off(touchEndEventName);
+            $node.on(touchEndEventName, selector, function(evt) {
+                $node.off(touchMoveEventName, selector);
+                $node.off(touchEndEventName, selector);
             });
         });
     };

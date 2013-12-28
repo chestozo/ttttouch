@@ -9,19 +9,19 @@ var init = function() {
     //     $node.css('background-color', '#EEE');
     // });
 
-    ttttouch.on(node, 'swipeLeft', function() {
+    ttttouch.on('#card', 'swipeLeft', function() {
         $node.css('background-color', 'red');
     });
 
-    ttttouch.on(node, 'swipeRight', function() {
+    ttttouch.on('#card', 'swipeRight', function() {
         $node.css('background-color', 'green');
     });
 
-    ttttouch.on(node, 'swipeTop', function() {
+    ttttouch.on('#card', 'swipeTop', function() {
         $node.css('background-color', 'white');
     });
 
-    ttttouch.on(node, 'swipeBottom', function() {
+    ttttouch.on('#card', 'swipeBottom', function() {
         $node.css('background-color', 'yellow');
     });
 
