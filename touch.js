@@ -34,11 +34,15 @@ var eventTypes = {
     info: function(p1, p2) {
         var dx = p2[0] - p1[0];
         var dy = p2[1] - p1[1];
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        var a = a(dx / dist, dy / dist);
 
         return {
+            dir: dir(a),
             xdir: norm(dx),
             ydir: norm(dy),
-            dist: Math.sqrt(dx * dx + dy * dy)
+            angle: a,
+            dist: dist
         };
 
         function norm(val) {
@@ -48,6 +52,24 @@ var eventTypes = {
                 return -1;
             }
             return 0;
+        }
+
+        function a(dx, dy) {
+            if (dx === 0) {
+                return dy > 0 ? 90 : 270;
+            }
+            if (dy === 0) {
+                return dx > 0 ? 0 : 180;
+            }
+            return Math.round((Math.acos(dx) * 180 / Math.PI) + (dy < 0 ? 180 : 0));
+        }
+
+        function dir(a) {
+            if (a > (315 + 15) || a < 30) return 'right';
+            if (a > (135 + 15) && a < 225 - 15) return 'left';
+            if (a > (45 + 15) && a < 135 - 15) return 'top';
+            if (a > (225 + 15) && a < 315 - 15) return 'bottom';
+            return null;
         }
     },
 };
