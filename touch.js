@@ -1,35 +1,50 @@
 (function() {
 
-var eventTypes = {
-    swipeLeft: function(node, callback, options) {
+var is_touch = 'ontouchstart' in window;
+var evtType = function(type) {
+    switch(type) {
+        case 'touchstart':
+            return is_touch ? 'touchstart' : 'mousedown';
+        case 'touchmove':
+            return is_touch ? 'touchmove' : 'mousemove';
+        case 'touchend':
+            return is_touch ? 'touchend' : 'mouseup';
+    }
+};
+
+var _swipe = function(dir) {
+    return function(node, callback, options) {
         var $node = $(node);
         var startPoint;
+        options = $.extend({ min: 3 }, options);
 
-        $node.on('mousedown', function(evt) {
-            startPoint = [ evt.originalEvent.pageX, evt.originalEvent.pageY ];
+        $node.on(evtType('touchstart'), function(evt) {
+            startPoint = eventTypes.extractPoint(evt);
+            var touchMoveEventName = evtType('touchmove') + '.ttttouch';
+            var touchEndEventName = evtType('touchend') + '.ttttouch';
+
+            $node.on(touchMoveEventName, function(evt) {
+                var stopPoint = eventTypes.extractPoint(evt);
+                var info = eventTypes.info(startPoint, stopPoint);
+                if (info.dir === dir && info.dist >= options.min) {
+                    callback(info);
+                    $node.off(touchMoveEventName);
+                }
+            });
+
+            $node.on(touchEndEventName, function(evt) {
+                $node.off(touchMoveEventName);
+                $node.off(touchEndEventName);
+            });
         });
-        $node.on('mouseup', function(evt) {
-            var stopPoint = [ evt.originalEvent.pageX, evt.originalEvent.pageY ];
-            var info = eventTypes.info(startPoint, stopPoint);
-            // if (info.
+    };
+};
 
-
-            if (check(startPoint, stopPoint)) {
-                $node.trigger('swipeLeft');
-            }
-        });
-
-
-        // $n.on('touchstart', function(evt) {
-        //     left = evt.originalEvent.touches[0].pageX;
-        // });
-
-        // $n.on('touchmove', function(evt) {
-        //     var delta = evt.originalEvent.touches[0].pageX - left;
-        //     $n.css('margin-left', defaultLeft + delta);
-        // });
-
-    },
+var eventTypes = {
+    swipeLeft: _swipe('left'),
+    swipeRight: _swipe('right'),
+    swipeTop: _swipe('top'),
+    swipeBottom: _swipe('bottom'),
 
     info: function(p1, p2) {
         var dx = p2[0] - p1[0];
@@ -40,7 +55,7 @@ var eventTypes = {
         return {
             dir: dir(a),
             xdir: norm(dx),
-            ydir: norm(dy),
+            ydir: -norm(dy),
             angle: a,
             dist: dist
         };
@@ -57,14 +72,14 @@ var eventTypes = {
         // 0 .. 359
         function a(dx, dy) {
             if (dx === 0) {
-                return dy > 0 ? 90 : 270;
+                return dy > 0 ? 270 : 90;
             }
             if (dy === 0) {
                 return dx > 0 ? 0 : 180;
             }
             var a = Math.round(Math.acos(dx) * 180 / Math.PI);
 
-            if (dy < 0) {
+            if (dy > 0) {
                 a = 360 - a;
             }
             return a;
@@ -78,6 +93,11 @@ var eventTypes = {
             return null;
         }
     },
+
+    extractPoint: function(evt) {
+        var origEvent = evt.originalEvent;
+        return origEvent.touches ? [ origEvent.touches[0].pageX, origEvent.touches[0].pageY ] : [ origEvent.pageX, origEvent.pageY ];
+    }
 };
 
 // Export.
@@ -88,9 +108,4 @@ window.ttttouch = {
     __eventTypes: eventTypes // For tests
 };
 
-
-
-
 }());
-
-
