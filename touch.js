@@ -95,13 +95,12 @@ var swipe = function(dir) {
                 var info = getInfo(startPoint, stopPoint);
                 if (info.dir === dir && info.dist >= options.min) {
                     callback(evt, info);
-                    $node.off(touchMoveEventName, selector);
+                    $node.off('.ttttouch');
                 }
             });
 
             $node.on(touchEndEventName, selector, function(evt) {
-                $node.off(touchMoveEventName, selector);
-                $node.off(touchEndEventName, selector);
+                $node.off('.ttttouch');
             });
         });
     };
