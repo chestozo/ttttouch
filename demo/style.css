@@ -44,3 +44,11 @@ body a:visited {
   -webkit-user-select: none;
   background: red;
 }
+
+#inner {
+  display: inline-block;
+  width: 100px;
+  height: 60px;
+  margin: 1em;
+  background: #444;
+}

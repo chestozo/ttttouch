@@ -19,19 +19,6 @@ var extractPoint = function(evt) {
 };
 
 var getInfo = function(p1, p2) {
-    var dx = p2[0] - p1[0];
-    var dy = p2[1] - p1[1];
-    var dist = Math.sqrt(dx * dx + dy * dy);
-    var a = a(dx / dist, dy / dist);
-
-    return {
-        dir: dir(a),
-        xdir: norm(dx),
-        ydir: -norm(dy),
-        angle: a,
-        dist: dist
-    };
-
     function norm(val) {
         if (val > 0) {
             return 1;
@@ -42,7 +29,7 @@ var getInfo = function(p1, p2) {
     }
 
     // 0 .. 359
-    function a(dx, dy) {
+    function angle(dx, dy) {
         if (dx === 0) {
             return dy > 0 ? 270 : 90;
         }
@@ -58,74 +45,75 @@ var getInfo = function(p1, p2) {
     }
 
     function dir(a) {
-        if (a > (315 + 15) || a < 30) return 'right';
-        if (a > (135 + 15) && a < 225 - 15) return 'left';
-        if (a > (45 + 15) && a < 135 - 15) return 'top';
-        if (a > (225 + 15) && a < 315 - 15) return 'bottom';
+        if (a > (315 + 15) || a < 30) { return 'right'; }
+        if (a > (135 + 15) && a < 225 - 15) { return 'left'; }
+        if (a > (45 + 15) && a < 135 - 15) { return 'top'; }
+        if (a > (225 + 15) && a < 315 - 15) { return 'bottom'; }
         return null;
     }
-};
 
-var swipe = function(dir) {
-    return function(node, callback, options) {
-        var startPoint;
-        var selector = undefined;
+    var dx = p2[0] - p1[0];
+    var dy = p2[1] - p1[1];
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    var a = angle(dx / dist, dy / dist);
 
-        options = $.extend({ min: 3 }, options);
-
-        if (typeof node === 'string') {
-            selector = node;
-            node = document;
-        }
-
-        var $node = $(node);
-        var cleanup = function() {
-            $node.off('.ttttouch');
-            startPoint = null;
-        };
-
-        $node.on(evtType('touchstart'), function(evt) {
-            startPoint = extractPoint(evt);
-            var touchMoveEventName = evtType('touchmove') + '.ttttouch';
-            var touchEndEventName = evtType('touchend') + '.ttttouch';
-
-            if (evt.originalEvent.touches && evt.originalEvent.touches.length > 1) {
-                // Do not react on multigesture.
-                return;
-            }
-
-            $node.on(touchMoveEventName, selector, function(evt) {
-                if (!startPoint) {
-                    return;
-                }
-
-                var stopPoint = extractPoint(evt);
-                var info = getInfo(startPoint, stopPoint);
-                if (info.dir === dir && info.dist >= options.min) {
-                    callback(evt, info);
-                    cleanup();
-                }
-            });
-
-            $node.on(touchEndEventName, selector, function(evt) {
-                cleanup();
-            });
-        });
+    return {
+        dir: dir(a),
+        xdir: norm(dx),
+        ydir: -norm(dy),
+        angle: a,
+        dist: dist
     };
 };
 
-var eventTypes = {
-    swipeLeft: swipe('left'),
-    swipeRight: swipe('right'),
-    swipeTop: swipe('top'),
-    swipeBottom: swipe('bottom')
+var capitalizeFirst = function(str) {
+    return (str && str.length) ? (str.substring(0, 1).toUpperCase() + str.substring(1)) : str;
 };
+
+var swipeMinLength = 40;
+
+var getGesture = function(p1, p2) {
+    var info = getInfo(p1, p2);
+    if (info.dir && info.dist >= swipeMinLength) {
+        return {
+            type: 'swipe' + capitalizeFirst(info.dir),
+            info: info
+        };
+    }
+};
+
+// ----------------------------------------------------------------------------------------------------------------- //
+
+var touchStartPoint = null;
+var touchStartNode = null;
+
+// Bind once trigger many times.
+$(document)
+    .on(evtType('touchstart'), function(evt) {
+        // NOTE: Do not react on multigesture now.
+        if (evt.originalEvent.touches && evt.originalEvent.touches.length > 1) {
+            return;
+        }
+
+        touchStartPoint = extractPoint(evt);
+        touchStartNode = evt.target;
+    })
+    .on([evtType('touchmove'), evtType('touchend')].join(' '), function(evt) {
+        if (!touchStartPoint) {
+            return;
+        }
+
+        var gesture = getGesture(touchStartPoint, extractPoint(evt));
+        if (gesture) {
+            $(touchStartNode).trigger(gesture.type, [ evt, gesture.info ]);
+
+            touchStartPoint = null;
+            touchStartNode = null;
+        }
+    });
 
 // Export.
 window.ttttouch = {
-    on: function(node, eventType, callback, options) {
-        eventTypes[eventType](node, callback, options);
-    },
 
     // For tests.
     __test: {

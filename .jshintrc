@@ -1,0 +1,23 @@
+{
+    "asi":      false,
+    "bitwise":  true,
+    "browser":  true,
+    "curly":    true,
+    "debug":    false,
+    "eqeqeq":   false,
+    "immed":    false,
+    "jquery":   true,
+    "latedef":  true,
+    "laxbreak": false,
+    "newcap":   false,
+    "noarg":    true,
+    "noempty":  true,
+    "nonew":    true,
+    "sub":      true,
+    "undef":    true,
+    "unused":   true,
+    "white":    false,
+    "trailing": true,
+    "globals":  {
+    }
+}
