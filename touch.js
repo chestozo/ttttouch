@@ -23,12 +23,18 @@ var _swipe = function(dir) {
             var touchMoveEventName = evtType('touchmove') + '.ttttouch';
             var touchEndEventName = evtType('touchend') + '.ttttouch';
 
+            if (evt.originalEvent.touches && evt.originalEvent.touches.length > 1) {
+                // Do not react on multigesture.
+                return;
+            }
+
             $node.on(touchMoveEventName, function(evt) {
                 var stopPoint = eventTypes.extractPoint(evt);
                 var info = eventTypes.info(startPoint, stopPoint);
                 if (info.dir === dir && info.dist >= options.min) {
                     callback(info);
                     $node.off(touchMoveEventName);
+                    evt.preventDefault();
                 }
             });
 
