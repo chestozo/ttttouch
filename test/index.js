@@ -1,8 +1,8 @@
-var eventTypes = ttttouch.__eventTypes;
+var getInfo = ttttouch.__test.getInfo;
 
 var infoTest = function(p1, p2, info) {
     return function() {
-        expect(eventTypes.info(p1, p2)).to.eql(info);
+        expect(getInfo(p1, p2)).to.eql(info);
     };
 };
 
