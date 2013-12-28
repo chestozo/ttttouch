@@ -102,7 +102,7 @@ $(document)
         touchStartPoint = extractPoint(evt);
         touchStartNode = evt.target;
     })
-    .on([evtType('touchmove'), evtType('touchend')].join(' '), function(evt) {
+    .on(evtType('touchmove'), function(evt) {
         if (!touchStartPoint) {
             return;
         }
@@ -110,10 +110,22 @@ $(document)
         var gesture = getGesture(touchStartPoint, extractPoint(evt) || touchStartPoint);
         if (gesture) {
             $(touchStartNode).trigger(gesture.type, [ evt, gesture.info ]);
-
             touchStartPoint = null;
             touchStartNode = null;
         }
+    })
+    .on(evtType('touchend'), function(evt) {
+        if (!touchStartPoint) {
+            return;
+        }
+
+        var gesture = getGesture(touchStartPoint, extractPoint(evt) || touchStartPoint);
+        if (gesture) {
+            $(touchStartNode).trigger(gesture.type, [ evt, gesture.info ]);
+        }
+
+        touchStartPoint = null;
+        touchStartNode = null;
     });
 
 // Export.
