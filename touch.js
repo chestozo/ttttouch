@@ -79,6 +79,10 @@ var swipe = function(dir) {
         }
 
         var $node = $(node);
+        var cleanup = function() {
+            $node.off('.ttttouch');
+            startPoint = null;
+        };
 
         $node.on(evtType('touchstart'), function(evt) {
             startPoint = extractPoint(evt);
@@ -91,16 +95,20 @@ var swipe = function(dir) {
             }
 
             $node.on(touchMoveEventName, selector, function(evt) {
+                if (!startPoint) {
+                    return;
+                }
+
                 var stopPoint = extractPoint(evt);
                 var info = getInfo(startPoint, stopPoint);
                 if (info.dir === dir && info.dist >= options.min) {
                     callback(evt, info);
-                    $node.off('.ttttouch');
+                    cleanup();
                 }
             });
 
             $node.on(touchEndEventName, selector, function(evt) {
-                $node.off('.ttttouch');
+                cleanup();
             });
         });
     };
